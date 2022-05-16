@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86 x86_64
+description: ti.googlepay
+author: Your Name
+license: Specify your license
+copyright: Copyright (c) 2022 by Your Company
+
+# these should not be edited
+name: ti.googlepay
+moduleid: ti.googlepay
+guid: e2fb63d2-4add-460f-a87f-370eeacff9a6
+platform: android
+minsdk: 9.0.0
