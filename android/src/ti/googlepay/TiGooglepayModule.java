@@ -222,13 +222,10 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
                 });
     }
 
-    // Methods
-    @Kroll.method
-    public void init() {
+    private void init() {
         if (payActivity == null) {
             payActivity = TiApplication.getInstance().getCurrentActivity();
             paymentsClient = createPaymentsClient(payActivity);
-            //possiblyShowGooglePayButton();
             TiBaseActivity baseActivity = (TiBaseActivity) TiApplication.getInstance().getCurrentActivity();
             baseActivity.addOnActivityResultListener(this);
         }
@@ -237,6 +234,9 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
 
     @Kroll.method
     public void setupPaymentGateway(KrollDict kd) {
+        if (payActivity == null) {
+            init();
+        }
         gatewayName = kd.getString("name");
         gatewayApikey = kd.getString("apiKey");
     }
@@ -271,15 +271,11 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
             return;
         }
 
-        Log.i(LCAT, "Final JSON: ");
-        Log.i(LCAT, paymentDataRequestJson.get().toString());
-
         PaymentDataRequest request = PaymentDataRequest.fromJson(paymentDataRequestJson.get().toString());
         if (request != null) {
             AutoResolveHelper.resolveTask(
                     paymentsClient.loadPaymentData(request),
                     payActivity, LOAD_PAYMENT_DATA_REQUEST_CODE);
-
         }
 
     }
@@ -309,22 +305,6 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
                         break;
                 }
         }
-
     }
-
-/*
-    // Properties
-    @Kroll.getProperty
-    public String getExampleProp() {
-        Log.d(LCAT, "get example property");
-        return "hello world";
-    }
-
-
-    @Kroll.setProperty
-    public void setExampleProp(String value) {
-        Log.d(LCAT, "set example property: " + value);
-    }
-*/
 }
 

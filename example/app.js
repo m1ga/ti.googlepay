@@ -1,3 +1,10 @@
+const win = Ti.UI.createWindow();
+const btn = Ti.UI.createButton({
+	title: "test payment"
+});
+win.add(btn);
+win.open();
+
 var gpay = require("ti.googlepay");
 gpay.addEventListener("available", function(e) {
 	console.log(e.success);
@@ -14,25 +21,18 @@ gpay.addEventListener("error", function(e) {
 	console.log("status");
 })
 
-function doClick(e) {
-	gpay.init();
-}
-
-$.index.open();
-
-function doClickPay(e) {
-
+btn.addEventListener("click", e => {
 	gpay.setupPaymentGateway({
 		name: gpay.PAYMENT_GATEWAY_STRIPE,
-		apiKey: 'YOUR_API_KEY'
+		apiKey: 'API_KEY'
 	});
 
 	gpay.createPaymentRequest({
 		environment: gpay.ENVIRONMENT_TEST,
-		price: 1000,	// 10.00 €
+		price: 1000,
 		countryCode: "DE",
 		currencyCode: "EUR",
 		merchantName: "Test User",
 		supportedNetworks: [gpay.PAYMENT_NETWORK_VISA, gpay.PAYMENT_NETWORK_MASTERCARD]
 	});
-}
+});
