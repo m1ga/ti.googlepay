@@ -1,5 +1,7 @@
 # Google Pay
 
+Add Google Pay to your app:
+
 <img src="screen.png"/>
 
 ## Events
