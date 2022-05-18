@@ -1,5 +1,7 @@
 # Google Pay
 
+<img src="screen.png"/>
+
 ## Events
 * available
 * success
@@ -11,11 +13,14 @@
 * createPaymentRequest: environment, price, countryCode, currencyCode, merchantName, supportedNetworks
 
 ## Constants
+Gateways:
 * PAYMENT_GATEWAY_STRIPE
 
+Environment:
 * ENVIRONMENT_PRODUCTION
 * ENVIRONMENT_TEST
 
+Networks:
 * PAYMENT_GATEWAY_STRIPE
 * PAYMENT_NETWORK_VISA
 * PAYMENT_NETWORK_MASTERCARD
