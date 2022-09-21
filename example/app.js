@@ -1,32 +1,45 @@
+var gpay = require("ti.googlepay");
 const win = Ti.UI.createWindow();
 const btn = Ti.UI.createButton({
 	title: "test payment"
 });
 win.add(btn);
-win.open();
-
-var gpay = require("ti.googlepay");
-gpay.addEventListener("available", function(e) {
-	console.log(e.success);
-})
-gpay.addEventListener("success", function(e) {
-	console.log("success:");
-	data = JSON.parse(e.info);
-	console.log(data.paymentMethodData.tokenizationData.token);
-})
-gpay.addEventListener("canceled", function(e) {
-	console.log("cancel");
-})
-gpay.addEventListener("error", function(e) {
-	console.log("status");
-})
-
-btn.addEventListener("click", e => {
+win.addEventListener("open", function(e) {
 	gpay.setupPaymentGateway({
 		name: gpay.PAYMENT_GATEWAY_STRIPE,
 		apiKey: 'API_KEY'
 	});
 
+	gpay.isAvailable();
+})
+win.open();
+
+gpay.addEventListener("available", function(e) {
+	console.log("available", e.success);
+	console.log(e.message);
+});
+
+gpay.addEventListener("success", function(e) {
+	console.log("success:");
+	data = JSON.parse(e.info);
+	console.log(data.paymentMethodData.tokenizationData.token);
+});
+
+gpay.addEventListener("canceled", function(e) {
+	console.log("cancel");
+});
+
+gpay.addEventListener("error", function(e) {
+	console.log("error");
+	console.log(e.message);
+});
+
+gpay.addEventListener("ready", function(e) {
+	console.log("ready");
+	gpay.doPayment();
+});
+
+btn.addEventListener("click", e => {
 	gpay.createPaymentRequest({
 		environment: gpay.ENVIRONMENT_TEST,
 		price: 1000,

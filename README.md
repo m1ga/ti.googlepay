@@ -9,10 +9,12 @@ Add Google Pay to your app:
 * success
 * canceled
 * error
+* ready
 
 ## Methods
 * setupPaymentGateway: name, apiKey
 * createPaymentRequest: environment, price, countryCode, currencyCode, merchantName, supportedNetworks
+* doPayment: show the payment screen
 
 ## Constants
 Gateways:

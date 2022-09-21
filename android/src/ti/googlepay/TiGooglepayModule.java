@@ -81,6 +81,7 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
     static int envToken = WalletConstants.ENVIRONMENT_TEST;
     PaymentsClient paymentsClient;
     Activity payActivity = null;
+    PaymentDataRequest paymentDataRequest;
 
     public TiGooglepayModule() {
         super();
@@ -200,9 +201,16 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
     }
 
     private void possiblyShowGooglePayButton() {
+        KrollDict kd = new KrollDict();
 
+        if (payActivity == null) {
+            init();
+        }
         final Optional<JSONObject> isReadyToPayJson = getIsReadyToPayRequest();
         if (!isReadyToPayJson.isPresent()) {
+            kd.put("success", false);
+            kd.put("message", "no payment request found");
+            fireEvent("available", kd);
             return;
         }
 
@@ -213,12 +221,14 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
         task.addOnCompleteListener(TiApplication.getAppCurrentActivity(),
                 task1 -> {
                     if (task1.isSuccessful()) {
-                        KrollDict kd = new KrollDict();
-                        kd.put("success", task1.getResult());
-                        fireEvent("available", kd);
+                        kd.put("message", task1.getResult());
+                        kd.put("success", true);
                     } else {
-                        Log.e("isReadyToPay failed", "" + task1.getException());
+                        kd.put("success", false);
+                        kd.put("message", task1.getException().getMessage());
+                        Log.e(LCAT, "" + task1.getException());
                     }
+                    fireEvent("available", kd);
                 });
     }
 
@@ -231,6 +241,11 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
         }
     }
 
+
+    @Kroll.method
+    public void isAvailable() {
+        possiblyShowGooglePayButton();
+    }
 
     @Kroll.method
     public void setupPaymentGateway(KrollDict kd) {
@@ -268,16 +283,35 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
 
         Optional<JSONObject> paymentDataRequestJson = getPaymentDataRequest(price);
         if (!paymentDataRequestJson.isPresent()) {
+            KrollDict kdEvent = new KrollDict();
+            kdEvent.put("message", "no payment data request");
+            fireEvent("error", kdEvent);
             return;
         }
 
-        PaymentDataRequest request = PaymentDataRequest.fromJson(paymentDataRequestJson.get().toString());
-        if (request != null) {
-            AutoResolveHelper.resolveTask(
-                    paymentsClient.loadPaymentData(request),
-                    payActivity, LOAD_PAYMENT_DATA_REQUEST_CODE);
+        paymentDataRequest = PaymentDataRequest.fromJson(paymentDataRequestJson.get().toString());
+        if (paymentDataRequest == null) {
+            KrollDict kdEvent = new KrollDict();
+            kdEvent.put("message", "no payment request");
+            fireEvent("error", kdEvent);
+            return;
         }
 
+        KrollDict kdEvent = new KrollDict();
+        kdEvent.put("message", "payment ready");
+        kdEvent.put("code", 1);
+        fireEvent("ready", kdEvent);
+    }
+
+    @Kroll.method
+    public void doPayment() {
+        if (paymentDataRequest != null && payActivity != null) {
+            AutoResolveHelper.resolveTask(
+                    paymentsClient.loadPaymentData(paymentDataRequest),
+                    payActivity, LOAD_PAYMENT_DATA_REQUEST_CODE);
+        } else {
+            Log.e(LCAT, "Initialize payment first");
+        }
     }
 
     @Override
