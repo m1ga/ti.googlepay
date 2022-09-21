@@ -1,16 +1,26 @@
 var gpay = require("ti.googlepay");
+var isReady = false;
 const win = Ti.UI.createWindow();
-const btn = Ti.UI.createButton({
-	title: "test payment"
-});
+const btn = Ti.UI.createButton({title: "test payment"});
 win.add(btn);
 win.addEventListener("open", function(e) {
+	// prepare payment
 	gpay.setupPaymentGateway({
 		name: gpay.PAYMENT_GATEWAY_STRIPE,
 		apiKey: 'API_KEY'
 	});
 
+	gpay.createPaymentRequest({
+		environment: gpay.ENVIRONMENT_TEST,
+		price: 1000,
+		countryCode: "DE",
+		currencyCode: "EUR",
+		merchantName: "Test User",
+		supportedNetworks: [gpay.PAYMENT_NETWORK_VISA, gpay.PAYMENT_NETWORK_MASTERCARD]
+	});
+
 	gpay.isAvailable();
+
 })
 win.open();
 
@@ -36,16 +46,13 @@ gpay.addEventListener("error", function(e) {
 
 gpay.addEventListener("ready", function(e) {
 	console.log("ready");
-	gpay.doPayment();
+	isReady = true;
 });
 
 btn.addEventListener("click", e => {
-	gpay.createPaymentRequest({
-		environment: gpay.ENVIRONMENT_TEST,
-		price: 1000,
-		countryCode: "DE",
-		currencyCode: "EUR",
-		merchantName: "Test User",
-		supportedNetworks: [gpay.PAYMENT_NETWORK_VISA, gpay.PAYMENT_NETWORK_MASTERCARD]
-	});
+	if (isReady) {
+		gpay.doPayment();
+	} else {
+		alert("Payment is not ready")
+	}
 });
