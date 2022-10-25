@@ -233,12 +233,10 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
     }
 
     private void init() {
-        if (payActivity == null) {
-            payActivity = TiApplication.getInstance().getCurrentActivity();
-            paymentsClient = createPaymentsClient(payActivity);
-            TiBaseActivity baseActivity = (TiBaseActivity) TiApplication.getInstance().getCurrentActivity();
-            baseActivity.addOnActivityResultListener(this);
-        }
+        payActivity = TiApplication.getInstance().getCurrentActivity();
+        paymentsClient = createPaymentsClient(payActivity);
+        TiBaseActivity baseActivity = (TiBaseActivity) TiApplication.getInstance().getCurrentActivity();
+        baseActivity.addOnActivityResultListener(this);
     }
 
 
@@ -249,9 +247,9 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
 
     @Kroll.method
     public void setupPaymentGateway(KrollDict kd) {
-        if (payActivity == null) {
-            init();
-        }
+        //if (payActivity == null) {
+        init();
+        //}
         gatewayName = kd.getString("name");
         gatewayApikey = kd.getString("apiKey");
     }
