@@ -303,10 +303,11 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
 
     @Kroll.method
     public void doPayment() {
+        Activity activity = TiApplication.getAppCurrentActivity();
         if (paymentDataRequest != null && payActivity != null) {
             AutoResolveHelper.resolveTask(
                     paymentsClient.loadPaymentData(paymentDataRequest),
-                    payActivity, LOAD_PAYMENT_DATA_REQUEST_CODE);
+                    activity, LOAD_PAYMENT_DATA_REQUEST_CODE);
         } else {
             Log.e(LCAT, "Initialize payment first");
         }
@@ -316,7 +317,6 @@ public class TiGooglepayModule extends KrollModule implements TiLifecycle.OnActi
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             // value passed in AutoResolveHelper
-
             case LOAD_PAYMENT_DATA_REQUEST_CODE:
                 KrollDict kd = new KrollDict();
                 switch (resultCode) {
